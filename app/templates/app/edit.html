@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<h3>Update blog</h3>
+<form action="" enctype="multipart/form-data" method="post">
+    {% csrf_token %}
+    <label for="">Title:</label><br>
+    <input type="text" name="title" value="{{blog.title}}" ><br>
+    <label for="">Body:</label><br>
+    <textarea name="body">{{blog.body}}</textarea><br>
+    <label for="">Image:</label>
+    <input type="file" name="image" ><br>
+    <label for="">Description</label><br>
+    <textarea name="Description" >{{blog.description}}</textarea><br>
+    <button>Edit Blog</button>
+</form>
+
+{%  endblock main %} 

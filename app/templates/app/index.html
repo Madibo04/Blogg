@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+
+{% block main %}
+
+<h1>
+    Hello World!!!!!!!!
+</h1>
+<ol>
+    {% for item in product%}
+<li>
+    {{item}}
+</li>
+{%endfor%}
+</ol>
+<img src="{% static 'assets/logo.jpg' %}" alt="Image">
+
+{% endblock main %}
