@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block main %}
+<h1>Donations</h1>
+<form action="" method="post">
+    {% csrf_token %}
+    <label for="">Email</label><br>
+    <input type="email" name="email"><br>
+    <label for="">Amount</label><br>
+    <input type="number" name="amount"><br>
+    <button>Donate</button>
+</form>
+
+{% endblock main %}

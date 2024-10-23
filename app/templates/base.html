@@ -17,6 +17,8 @@
             <li><a href="{% url 'home' %}">Home</a></li>
             <li><a href="{% url 'about' %}">About</a></li>
             <li><a href="{% url 'school' 'sola' %}">Contact</a></li>
+            <li><a href="{% url 'contact' %}">Contact-us</a></li>
+            <li><a href="{% url 'donate' %}">Donations</a></li>
             {%  if user.is_authenticated %}
             <li><a href="{% url 'blogs' %}">Blogs</a></li>
             <li><a href="{% url 'create' %}">Create Blog</a></li>

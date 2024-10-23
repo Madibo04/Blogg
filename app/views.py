@@ -1,10 +1,15 @@
 from django.shortcuts import render, redirect, reverse
-from app.models import Blog, Comment
+from app.models import Blog, Comment, Contact
 from django.contrib import messages
 from django.contrib.auth.models import User, auth
 from django.contrib.auth.decorators import login_required
+from django.core.mail import EmailMessage
+from django.conf import settings
+import requests
+import random
 
 # Create your views here.
+
 def homepage(request):
     all_products = ['Tote-bag', 'Shoes', 'Jewelries', 'Amala', 'Assorted']
     context = {'product': all_products}
@@ -191,3 +196,77 @@ def login(request):
 def logout(request):
     auth.logout(request)
     return redirect(login)
+
+def contact(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        email = request.POST.get('email')
+        message = request.POST.get('message')
+        if not name or not email or not message:
+            messages.error(request, "Field cannot be blank")
+            return  redirect(contact)
+        new_contact = Contact.objects.create(
+            name = name,
+            email = email,
+            message = message
+        )
+        new_contact.save()
+        subject = "Thank you for reaching out"
+        body = f"Hello {name},\n\nThank you for contacting us.\n\n\tOkiki\nCEO Klicks Venture"
+        send_email = EmailMessage(
+            subject= subject,
+            body = body,
+            from_email = settings.EMAIL_HOST_USER,
+            to = [email]
+        )
+        send_email.send()
+
+        send_email = EmailMessage(
+            subject="New contact us message!",
+            body = f"Someone filled the form with the following details:\nName:{name}\nEmail:{email}\nMessage:{message}",
+            from_email = settings.EMAIL_HOST_USER,
+            to = ['madibohabeeb04@gmail.com']
+        )
+        send_email.send()
+        messages.success(request, "Message sent successfully")
+        return redirect(homepage)
+    return render(request, "app/contact.html")
+
+def donate(request):
+    if request.method == "POST":
+        email = request.POST.get('email')
+        amount = request.POST.get("amount")
+        if not amount or not email:
+            messages.error(request, 'All Fields required')
+            return redirect(donate)
+        
+        reference = random.randrange(1111111111, 9999999999)
+
+        amount = int(amount) * 100
+        data = {"email": email, 'amount':amount, 'reference': reference, 'callback_url': "http://127.0.0.1:8000/verify"}
+        url = 'https://api.paystack.co/transaction/initialize'
+        headers = {'Authorization': f'Bearer {settings.PAYSTACK_SECRET_KEY}'}
+        req = requests.post(url, headers=headers, data=data)
+        response = req.json()
+        if response.get("status"):
+            authorization_url = response["data"].get("authorization_url")
+            if authorization_url:
+                return redirect(authorization_url)
+    return render(request, 'app/donate.html')
+
+def verify(request):
+    reference = request.GET.get("trxref")
+    url = f'https://api.paystack.co/transaction/verify/{reference}'
+    headers = {'Authorization': f'Bearer {settings.PAYSTACK_SECRET_KEY}'}
+    req = requests.get(url, headers=headers)
+    response = req.json()
+    if response.get("status"):
+        return render(request , 'app/thanks.html')
+    return redirect(donate)
+
+
+def custom_404(request, exception):
+    return render(request, 'app/error_404.html', status=404)
+
+def custom_500(request):
+    return render(request, 'app/error_500.html', status=500)

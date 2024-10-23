@@ -12,5 +12,8 @@ urlpatterns = [
     path('create', create, name="create"),
     path('signup', signup, name="signup"),
     path('login', login, name="login"),
-    path('logout', logout, name="logout")
+    path('logout', logout, name="logout"),
+    path('contact', contact, name="contact"),
+    path('donate', donate,  name="donate"),
+    path('verify', verify, name = "verify"),
 ]
